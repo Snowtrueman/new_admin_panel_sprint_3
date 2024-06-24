@@ -1,0 +1,6 @@
+creds.ini
+.idea/
+__pycache__/
+*.pyc
+.virtualenvs
+*.env

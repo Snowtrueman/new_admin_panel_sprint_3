@@ -1,4 +1,5 @@
 import os
+import datetime
 
 from dotenv import load_dotenv
 
@@ -12,4 +13,8 @@ POSTGRES_DSN = {
     "host": os.environ.get("POSTGRES_HOST", "postgres"),
     "port": os.environ.get("POSTGRES_PORT", 5432)}
 
-DB_QUERY_CHUNK_SIZE = 100
+POSTGRES_SCHEMA = os.environ.get("POSTGRES_SCHEMA", "content")
+
+DB_QUERY_CHUNK_SIZE = 1
+
+EPOCH_START_DATE = datetime.datetime(1970, 1, 1, 0, 0, 0)
