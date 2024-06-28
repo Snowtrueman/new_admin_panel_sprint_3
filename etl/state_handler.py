@@ -5,21 +5,25 @@ from typing import Any, Dict
 
 
 class BaseStorage(abc.ABC):
-    """Абстрактное хранилище состояния.
-
-    Позволяет сохранять и получать состояние.
-    Способ хранения состояния может варьироваться в зависимости
-    от итоговой реализации. Например, можно хранить информацию
-    в базе данных или в распределённом файловом хранилище.
+    """
+    Abstract state handler
     """
 
     @abc.abstractmethod
     def save_state(self, state: Dict[str, Any]) -> None:
-        """Сохранить состояние в хранилище."""
+        """
+        Saves state in storage
+        """
+
+        raise NotImplementedError
 
     @abc.abstractmethod
     def retrieve_state(self) -> Dict[str, Any]:
-        """Получить состояние из хранилища."""
+        """
+        Receives state from storage
+        """
+
+        raise NotImplementedError
 
 
 class JsonFileStorage(BaseStorage):
@@ -99,5 +103,4 @@ STATE_TEMPLATE = {
     "elastic": {
         "status": ""
     },
-    "date": ""
 }
