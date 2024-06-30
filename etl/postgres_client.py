@@ -62,11 +62,7 @@ class PostgresClient:
         return results_as_dicts
 
     @backoff()
-    def __perform_db_action(self,
-                            query: str,
-                            items_ids: Optional[list] = None,
-                            flat: bool = True
-                            ) -> Union[list, dict]:
+    def perform_db_action(self, query: str, items_ids: Optional[list] = None, flat: bool = True ) -> Union[list, dict]:
         """
         Executes query in Postgres
         """

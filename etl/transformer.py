@@ -10,17 +10,16 @@ class FilmWorkMerger:
     Class for merging different film work records extracted from database into one (with merged genres and participants)
     """
 
-    def __init__(self, income_film_works: list[dict], logger: logging.Logger):
-        self._income_film_works: list[dict] = income_film_works
+    def __init__(self, logger: logging.Logger):
         self._merged_film_works: dict[str, PostgresFilmWorkSerializer] = {}
         self._logger: logging.Logger = logger
 
-    def merge_persons(self) -> dict[str, PostgresFilmWorkSerializer]:
+    def merge_persons(self, income_film_works: list[dict]) -> dict[str, PostgresFilmWorkSerializer]:
         """
         Merges different film work records extracted from database into one
         """
 
-        for film_work_record in self._income_film_works:
+        for film_work_record in income_film_works:
             try:
                 validated_film_work = PostgresFilmWorkSerializer(**film_work_record)
             except ValidationError:
@@ -61,17 +60,18 @@ class PostgresToElasticTransformer:
     Class for serializing merged film work objects to Elasticsearch index format
     """
 
-    def __init__(self, postgres_film_works_list: dict[str, PostgresFilmWorkSerializer], logger: logging.Logger):
-        self._postgres_film_works_list: dict[str, PostgresFilmWorkSerializer] = postgres_film_works_list
+    def __init__(self, logger: logging.Logger):
         self._elastic_film_works_list:  list[ElasticFilmWorkSerializer] = []
         self._logger: logging.Logger = logger
 
-    def transform(self) -> list[ElasticFilmWorkSerializer]:
+    def transform(self,
+                  postgres_film_works_list: dict[str, PostgresFilmWorkSerializer]
+                  ) -> list[ElasticFilmWorkSerializer]:
         """
         Transforms film work objects to Elasticsearch index format
         """
 
-        for film_work_id, film_work_data in self._postgres_film_works_list.items():
+        for film_work_id, film_work_data in postgres_film_works_list.items():
             try:
                 elastic_film_work = ElasticFilmWorkSerializer(
                     id=film_work_data.film_work_id,
