@@ -3,7 +3,7 @@ import json
 from typing import Any, Dict
 
 from clients.redis_client import RedisClient
-from settings import REDIS_BASIC_STORAGE_KEY
+from settings import app_settings
 
 
 class BaseStorage(abc.ABC):
@@ -41,14 +41,14 @@ class RedisStorage(BaseStorage):
         Saves state in storage
         """
 
-        self.__redis_client.set(REDIS_BASIC_STORAGE_KEY, json.dumps(state))
+        self.__redis_client.set(app_settings.REDIS_BASIC_STORAGE_KEY, json.dumps(state))
 
     def retrieve_state(self) -> Dict[str, Any]:
         """
         Receives state from storage
         """
 
-        state = self.__redis_client.get(REDIS_BASIC_STORAGE_KEY)
+        state = self.__redis_client.get(app_settings.REDIS_BASIC_STORAGE_KEY)
         if state:
             return json.loads(state)
         else:

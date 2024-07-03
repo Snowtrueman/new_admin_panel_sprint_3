@@ -24,14 +24,6 @@ class ElasticLoader:
         created = self.__elastic_client.execute(command="create_index", path_to_schema=path_to_schema)
         return created
 
-    def delete_index(self, index_name: str) -> Optional[ObjectApiResponse]:
-        """
-        Removes Elasticsearch index according to provided index name
-        """
-
-        deleted = self.__elastic_client.execute(command="delete_index", index_name=index_name)
-        return deleted
-
     def load_data(self, transformed_film_works: list[ElasticFilmWorkSerializer]) -> Optional[tuple]:
         """
         Loads provided data records to Elasticsearch

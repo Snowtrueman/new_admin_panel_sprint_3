@@ -2,7 +2,7 @@ import datetime
 import logging
 from typing import Optional
 
-from settings import EPOCH_START_DATE, ELASTIC_SCHEMA
+from settings import app_settings
 from pipelines.extractor import Extractor
 from .transformer import FilmWorkMerger, PostgresToElasticTransformer
 from .loader import ElasticLoader
@@ -102,10 +102,10 @@ class Pipeline:
         index_created = self.__state_handler.get_state("index_created")
 
         if not index_created:
-            self.__elastic_client.execute(command="create_index", path_to_schema=ELASTIC_SCHEMA)
+            self.__elastic_client.execute(command="create_index", path_to_schema=app_settings.ELASTIC_SCHEMA)
             self.__state_handler.set_state("index_created", True)
 
-        if start_date == EPOCH_START_DATE:
+        if start_date == app_settings.EPOCH_START_DATE:
             self.__do_basic_pipeline(start_date)
         else:
             self.__do_full_pipeline(start_date)

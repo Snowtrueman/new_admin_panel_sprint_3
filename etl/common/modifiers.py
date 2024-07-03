@@ -2,7 +2,13 @@ import time
 from functools import wraps
 
 
-def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: int = 10):
+def backoff(
+        start_sleep_time: float = 0.1,
+        factor: int = 2,
+        border_sleep_time: int = 10,
+        max_attempts: int = 100,
+        exceptions: tuple = (Exception,)
+):
     """
     Re-executes the function after a potential fail while not succeed
     """
@@ -13,11 +19,11 @@ def backoff(start_sleep_time: float = 0.1, factor: int = 2, border_sleep_time: i
             logger = getattr(args[0], "logger") if hasattr(args[0], "logger") else None
             sleep_time = start_sleep_time
             n = 0
-            while True:
+            while n <= max_attempts:
                 n += 1
                 try:
                     return func(*args, **kwargs)
-                except Exception as e:
+                except exceptions:
                     if logger:
                         logger.error(f"An error in executing {func.__name__}. Retrying in {sleep_time} sec.")
                     time.sleep(sleep_time)

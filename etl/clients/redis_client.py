@@ -1,7 +1,7 @@
 import logging
 from typing import Optional, Any
 
-from redis import Redis, ConnectionPool
+from redis import Redis, ConnectionPool, RedisError
 from redis.commands.core import ResponseT
 
 from common.modifiers import Singleton, backoff
@@ -32,7 +32,7 @@ class RedisClient(metaclass=Singleton):
             self.__get_connection()
         return self.__connection
 
-    @backoff()
+    @backoff(exceptions=(RedisError,))
     def __get_connection(self) -> None:
         """
         Tries to establish Redis connection
@@ -41,7 +41,7 @@ class RedisClient(metaclass=Singleton):
         pool = ConnectionPool(host=self.__host, port=self.__port)
         self.__connection = Redis(connection_pool=pool)
 
-    @backoff()
+    @backoff(exceptions=(RedisError,))
     def get(self, key: str) -> ResponseT:
         """
         Gets the value from Redis by its key
@@ -49,7 +49,7 @@ class RedisClient(metaclass=Singleton):
 
         return self.connection.get(key)
 
-    @backoff()
+    @backoff(exceptions=(RedisError,))
     def set(self, key: str, value: Any) -> ResponseT:
         """
         Set the provided value for the provided key

@@ -1,37 +1,46 @@
 import os
 import datetime
 
-from dotenv import load_dotenv
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import PastDate
 
 
-load_dotenv()
+class AppSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_file=f"{os.path.dirname(os.path.abspath(__file__))}/.env")
 
-# COMMON
+    # COMMON
 
-POSTMAN_TESTS_PATH = "etl_tests.json"
-DB_QUERY_CHUNK_SIZE = 500
-EPOCH_START_DATE = datetime.datetime(1970, 6, 24, 0, 0, 0)  # extracting start date
+    DB_QUERY_CHUNK_SIZE: int = 500
 
-# POSTGRES
+    # extracting start date
+    EPOCH_START_DATE: PastDate = datetime.datetime(1970, 6, 24, 0, 0, 0)
 
-POSTGRES_DSN = {
-    "dbname": os.environ.get("POSTGRES_DBNAME", "postgres"),
-    "user": os.environ.get("POSTGRES_USER", "postgres"),
-    "password": os.environ.get("POSTGRES_PASSWORD", ""),
-    "host": os.environ.get("POSTGRES_HOST", "postgres"),
-    "port": os.environ.get("POSTGRES_PORT", 5432)}
+    # POSTGRES
 
-POSTGRES_SCHEMA = "content"
+    POSTGRES_DBNAME: str = "postgres"
+    POSTGRES_USER: str = "postgres"
+    POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str = "postgres"
+    POSTGRES_PORT: int = 5432
+    POSTGRES_SCHEMA: str = "content"
 
-# ELASTIC
+    # ELASTIC
 
-ELASTIC_DSN = (f"{os.environ.get('ELASTIC_SCHEMA', 'http')}://{os.environ.get('ELASTIC_HOST', '127.0.0.1')}:"
-               f"{os.environ.get('ELASTIC_PORT', '9200')}")
-ELASTIC_INDEX_NAME = "movies"
-ELASTIC_SCHEMA = "elastic_schema.json"
+    ELASTIC_PROTOCOL: str = "http"
+    ELASTIC_HOST: str = "127.0.0.1"
+    ELASTIC_PORT: int = 9200
+    ELASTIC_INDEX_NAME: str = "movies"
+    ELASTIC_SCHEMA: str = "elastic_schema.json"
 
-# REDIS
+    # REDIS
 
-REDIS_HOST = os.environ.get("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
-REDIS_BASIC_STORAGE_KEY = os.environ.get("REDIS_BASIC_STORAGE_KEY", "etl")
+    REDIS_HOST: str = "127.0.0.1"
+    REDIS_PORT: int = 6379
+    REDIS_BASIC_STORAGE_KEY: str = "etl"
+
+
+app_settings = AppSettings()
+
+
+
+

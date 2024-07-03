@@ -24,7 +24,7 @@ class PostgresClient:
     def logger(self) -> logging.Logger:
         return self.__logger
 
-    @backoff()
+    @backoff(exceptions=(psycopg2.Error,))
     @contextmanager
     def __get_db_connection(self) -> Optional[connection]:
         """
@@ -42,8 +42,12 @@ class PostgresClient:
                 yield conn
             except psycopg2.Error as exception:
                 self.__logger.error("An error while trying to connect to Postgres")
-                conn.close()
                 raise exception
+        finally:
+            try:
+                conn.close()
+            except UnboundLocalError:
+                pass
 
     def __make_dicts_from_query(self, columns: list, query_result: list) -> list[dict]:
         """
@@ -64,7 +68,7 @@ class PostgresClient:
             results_as_dicts.append(row_dict)
         return results_as_dicts
 
-    @backoff()
+    @backoff(exceptions=(psycopg2.Error,))
     def perform_db_action(self, query: str, items_ids: Optional[list] = None, flat: bool = True) -> Union[list, dict]:
         """
         Executes query in Postgres

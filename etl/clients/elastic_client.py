@@ -50,7 +50,7 @@ class ElasticClient(metaclass=Singleton):
             and callable(getattr(self, item))
         ]
 
-    @backoff()
+    @backoff(exceptions=(TransportError,))
     def execute(self, command: str, *args, **kwargs) -> Any:
         """
         Execute provided command
@@ -70,7 +70,7 @@ class ElasticClient(metaclass=Singleton):
                                 f"Elasticsearch using DSN: {self.__elastic_dsn}")
             raise exception
 
-    @backoff()
+    @backoff(exceptions=(TransportError,))
     def __get_elastic_connection(self) -> Optional[Elasticsearch]:
         """
         Tries to establish connection to Elastic using provided dsn
@@ -139,25 +139,6 @@ class ElasticClient(metaclass=Singleton):
                 self.__logger.error(f"An error while trying to create index - "
                                     f"Elasticsearch connection error using DSN: {self.__elastic_dsn}")
                 raise exception
-
-    def _delete_index(self, elastic_client: Elasticsearch, index_name: str) -> Optional[ObjectApiResponse]:
-        """
-        Removes index by its name
-        """
-
-        if not index_name:
-            self.__logger.error("Can't delete index - index name is not provided ")
-            return
-        try:
-            deleted = elastic_client.indices.delete(index=index_name)
-            return deleted
-        except ApiError as exception:
-            self.__logger.error("Can't delete index - no such index or other ES exception")
-            raise exception
-        except TransportError as exception:
-            self.__logger.error(f"An error while trying to delete index - "
-                                f"Elasticsearch connection error using DSN: {self.__elastic_dsn}")
-            raise exception
 
     def _load_data(self, elastic_client: Elasticsearch, data: list[ElasticFilmWorkSerializer]) -> tuple:
         """
